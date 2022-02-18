@@ -1,6 +1,8 @@
 package io.github.ruben.persona.infrastructure.controller;
 
 import io.github.ruben.persona.application.PersonaService;
+import io.github.ruben.persona.exceptions.IdNotFoundException;
+import io.github.ruben.persona.exceptions.UnprocesableException;
 import io.github.ruben.persona.infrastructure.controller.dto.input.PersonaInputDto;
 import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
 import org.springframework.beans.factory.annotation.Autowired;
