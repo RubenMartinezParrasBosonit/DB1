@@ -140,9 +140,8 @@ public class PersonaServiceImp implements PersonaService {
     }
 
     @Override
-    public String borrarPersona(Integer id){
+    public void borrarPersona(Integer id){
         personaRepositorio.delete(personaRepositorio.findById(id).orElseThrow(() ->new NoSuchElementException("Id no encontrado")));
-        return "Persona borrada";
     }
 
     private Persona personaOutputDtoToEntity(PersonaOutputDto personaOutputDto){
@@ -165,7 +164,6 @@ public class PersonaServiceImp implements PersonaService {
 
     private PersonaOutputDto personaInputDtoToPersonaOutputDto(PersonaInputDto personaInputDto){
         PersonaOutputDto personaOutputDto = new PersonaOutputDto();
-        personaOutputDto.setId_persona(personaInputDto.getId_persona());
         personaOutputDto.setUsuario(personaInputDto.getUsuario());
         personaOutputDto.setPassword(personaInputDto.getPassword());
         personaOutputDto.setName(personaInputDto.getName());

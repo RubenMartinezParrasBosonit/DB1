@@ -14,8 +14,8 @@ public class DeletePersonaController {
     @Autowired
     PersonaService personaService;
 
-    @DeleteMapping("/delete/{id}")
-    public String borrarPersona(@PathVariable Integer id) throws Exception{
-        return personaService.borrarPersona(id);
+    @DeleteMapping("{id}")
+    public void borrarPersona(@PathVariable Integer id) throws Exception{
+        personaService.borrarPersona(id);
     }
 }

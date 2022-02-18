@@ -16,7 +16,7 @@ public class CreatePersonaController {
     @Autowired
     PersonaService personaService;
 
-    @PostMapping("/addpersona")
+    @PostMapping
     public PersonaOutputDto aniadirPesona(@RequestBody PersonaInputDto personaInputDto) throws Exception {
         return personaService.aniadirPersona(personaInputDto);
     }

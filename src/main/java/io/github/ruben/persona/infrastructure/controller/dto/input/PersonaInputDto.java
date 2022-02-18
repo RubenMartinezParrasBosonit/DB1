@@ -10,7 +10,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class PersonaInputDto implements Serializable  {
-    private Integer id_persona;
     private String usuario;
     private String password;
     private String name;
@@ -26,7 +25,6 @@ public class PersonaInputDto implements Serializable  {
     public PersonaInputDto(Persona persona){
         if(persona==null)
             return;
-        setId_persona(persona.getId_persona());
         setUsuario(persona.getUsuario());
         setPassword(persona.getPassword());
         setName(persona.getName());

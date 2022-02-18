@@ -17,12 +17,12 @@ public class ReadPersonaController {
     @Autowired
     PersonaService personaService;
 
-    @GetMapping("/allpersonas")
-    public List<PersonaOutputDto> getAllPersonas(){
+    @GetMapping
+    public List<PersonaOutputDto> findAll(){
         return personaService.todasLasPersonas();
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("{id}")
     public PersonaOutputDto getPersonaById(@PathVariable Integer id){
         return personaService.filtrarPersonasPorId(id);
     }

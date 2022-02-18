@@ -13,7 +13,7 @@ public class UpdatePersonaController {
     @Autowired
     PersonaService personaService;
 
-    @PutMapping("/modificarpersona/{id}")
+    @PutMapping("{id}")
     public PersonaOutputDto modificarPersona(@PathVariable Integer id, @RequestBody PersonaInputDto personaInputDto) throws Exception {
         return personaService.modificarPersona(id, personaInputDto);
     }

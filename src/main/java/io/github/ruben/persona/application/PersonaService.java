@@ -11,5 +11,5 @@ public interface PersonaService {
     public List<PersonaOutputDto> filtrarPersonaPorNombreUsuario(String usuario);
     public PersonaOutputDto aniadirPersona(PersonaInputDto personaInputDto) throws Exception;
     public PersonaOutputDto modificarPersona(Integer id, PersonaInputDto personaInputDto) throws Exception;
-    public String borrarPersona(Integer id);
+    public void borrarPersona(Integer id);
 }
