@@ -15,12 +15,12 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     @ExceptionHandler(IdNotFoundException.class)
     public final ResponseEntity<CustomError> handleNotFoundException(IdNotFoundException ex, WebRequest request) {
         CustomError exceptionResponse = new CustomError(new Date(), HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        return new ResponseEntity<CustomError>(exceptionResponse, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<CustomError>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnprocesableException.class)
     public final ResponseEntity<CustomError> handleUnprocesableException(UnprocesableException ex, WebRequest request) {
         CustomError exceptionResponse = new CustomError(new Date(), HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage());
-        return new ResponseEntity<CustomError>(exceptionResponse, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<CustomError>(exceptionResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }
