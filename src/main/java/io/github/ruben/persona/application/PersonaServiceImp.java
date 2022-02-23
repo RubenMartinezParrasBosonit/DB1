@@ -1,11 +1,20 @@
 package io.github.ruben.persona.application;
 
-import io.github.ruben.persona.exceptions.IdNotFoundException;
-import io.github.ruben.persona.exceptions.UnprocesableException;
+import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDtoList;
+import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaProfesorOutputDto;
+import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaStudentOutputDto;
+import io.github.ruben.profesor.domain.Profesor;
+import io.github.ruben.profesor.infrastructure.repository.jpa.ProfesorRepositorio;
+import io.github.ruben.shared.exceptions.IdNotFoundException;
+import io.github.ruben.shared.exceptions.UnprocesableException;
 import io.github.ruben.persona.infrastructure.controller.dto.input.PersonaInputDto;
 import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
 import io.github.ruben.persona.infrastructure.repository.jpa.PersonaRepositorio;
 import io.github.ruben.persona.domain.Persona;
+import io.github.ruben.student.domain.Student;
+import io.github.ruben.student.infrastructure.controller.dto.output.StudentFullOutputDto;
+import io.github.ruben.student.infrastructure.controller.dto.output.StudentOutputDto;
+import io.github.ruben.student.infrastructure.repository.jpa.StudentRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,33 +27,156 @@ public class PersonaServiceImp implements PersonaService {
 
   @Autowired PersonaRepositorio personaRepositorio;
 
+  @Autowired StudentRepositorio studentRepositorio;
+
+  @Autowired ProfesorRepositorio profesorRepositorio;
+
   @Override
-  public List<PersonaOutputDto> todasLasPersonas() {
+  public PersonaOutputDtoList findAll(String outputType) {
     List<Persona> personas = personaRepositorio.findAll();
-    List<PersonaOutputDto> personasOutputDto = new ArrayList<>();
-    for (Persona persona : personas) {
-      personasOutputDto.add(new PersonaOutputDto(persona));
+    PersonaOutputDtoList personaOutputDtoList = new PersonaOutputDtoList();
+
+    if(outputType.equalsIgnoreCase("estudiantes") || outputType.equalsIgnoreCase("full")){
+      List<Student> students = studentRepositorio.findAll();
+
+      List<PersonaStudentOutputDto> personaStudentOutputDto = new ArrayList<>();
+      boolean encontrado = false;
+      for(int i = 0; i < personas.size(); i++){
+        encontrado = false;
+        for(int j = 0; j < students.size() && !encontrado; j++){
+          if (personas.get(i).getId_persona().equals(students.get(j).getIdPersona().getId_persona())){
+            personaStudentOutputDto.add(new PersonaStudentOutputDto(personas.get(i), students.get(j)));
+            encontrado = true;
+          }
+        }
+      }
+      personaOutputDtoList.setPersonaStudentOutputDtoList(personaStudentOutputDto);
+      if(outputType.equalsIgnoreCase("estudiantes")){
+        return personaOutputDtoList;
+      }
     }
-    return personasOutputDto;
+
+    if (outputType.equalsIgnoreCase("profesores") || outputType.equalsIgnoreCase("full")){
+      List<Profesor> profesores = profesorRepositorio.findAll();
+
+      List<PersonaProfesorOutputDto> personaProfesorOutputDto = new ArrayList<>();
+      boolean encontrado = false;
+      for(int i = 0; i < personas.size(); i++){
+        encontrado = false;
+        for(int j = 0; j < profesores.size() && !encontrado; j++){
+          if (personas.get(i).getId_persona().equals(profesores.get(j).getIdPersona().getId_persona())){
+            personaProfesorOutputDto.add(new PersonaProfesorOutputDto(personas.get(i), profesores.get(j)));
+            encontrado = true;
+          }
+        }
+      }
+      personaOutputDtoList.setPersonaProfesorOutputDtoList(personaProfesorOutputDto);
+
+      if(outputType.equalsIgnoreCase("profesores")){
+        return personaOutputDtoList;
+      }
+
+    }
+
+    if (outputType.equalsIgnoreCase("full")){
+      return personaOutputDtoList;
+    }
+
+    List<PersonaOutputDto> list = new ArrayList<>();
+    for (Persona persona : personas) {
+      list.add(new PersonaOutputDto(persona));
+    }
+    personaOutputDtoList.setPersonaOutputDtoList(list);
+    return personaOutputDtoList;
   }
 
   @Override
-  public PersonaOutputDto filtrarPersonasPorId(int id) {
+  public PersonaOutputDto filtrarPersonasPorId(int id, String outputType) {
     Persona persona =
         personaRepositorio.findById(id).orElseThrow(() -> new IdNotFoundException("Persona con id: "+id+ " no encontrado"));
-    PersonaOutputDto personaOutputDto = new PersonaOutputDto(persona);
-    return personaOutputDto;
+
+    if(outputType.equalsIgnoreCase("full")){
+      List<Student> estudiantes = studentRepositorio.findAll();
+      for(int i = 0; i < estudiantes.size(); i++){
+        if (estudiantes.get(i).getIdPersona().getId_persona().equals(persona.getId_persona())){
+          return new PersonaStudentOutputDto(persona, estudiantes.get(i));
+        }
+      }
+
+      List<Profesor> profesores = profesorRepositorio.findAll();
+      for (int i = 0; i < profesores.size(); i++) {
+        if (profesores.get(i).getIdPersona().getId_persona().equals(persona.getId_persona())) {
+          return new PersonaProfesorOutputDto(persona, profesores.get(i));
+        }
+      }
+
+      PersonaOutputDto personaOutputDto = new PersonaOutputDto(persona);
+      return personaOutputDto;
+
+    }else{
+      PersonaOutputDto personaOutputDto = new PersonaOutputDto(persona);
+      return personaOutputDto;
+    }
   }
 
   @Override
-  public List<PersonaOutputDto> filtrarPersonaPorNombreUsuario(String usuario) {
+  public PersonaOutputDtoList filtrarPersonaPorNombreUsuario(String usuario, String outputType) {
     List<Persona> personas = personaRepositorio.findByUsuario(usuario);
-    if (personas.size() == 0) throw new NoSuchElementException("Usuario no encontrado");
-    List<PersonaOutputDto> personasOutputDto = new ArrayList<>();
+    PersonaOutputDtoList personaOutputDtoList = new PersonaOutputDtoList();
+
+    if (personas.size() == 0) throw new IdNotFoundException("Usuario no encontrado");
+      List<PersonaOutputDto> personasOutputDto = new ArrayList<>();
     for (Persona persona : personas) {
       personasOutputDto.add(new PersonaOutputDto(persona));
     }
-    return personasOutputDto;
+
+    if(outputType.equalsIgnoreCase("estudiantes") || outputType.equalsIgnoreCase("full")){
+      List<Student> students = studentRepositorio.findAll();
+
+      List<PersonaStudentOutputDto> personaStudentOutputDto = new ArrayList<>();
+      boolean encontrado = false;
+      for(int i = 0; i < personasOutputDto.size(); i++){
+        encontrado = false;
+        for(int j = 0; j < students.size() && !encontrado; j++){
+          if (personasOutputDto.get(i).getId_persona().equals(students.get(j).getIdPersona().getId_persona())){
+            personaStudentOutputDto.add(new PersonaStudentOutputDto(personaRepositorio.findById(personasOutputDto.get(i).getId_persona()).orElseThrow(), students.get(j)));
+            encontrado = true;
+          }
+        }
+      }
+
+      personaOutputDtoList.setPersonaStudentOutputDtoList(personaStudentOutputDto);
+      if(outputType.equalsIgnoreCase("estudiantes")){
+        return personaOutputDtoList;
+      }
+
+    }
+
+    if(outputType.equalsIgnoreCase("profesores") || outputType.equalsIgnoreCase("full")){
+      List<Profesor> profesores = profesorRepositorio.findAll();
+
+      List<PersonaProfesorOutputDto> personaProfesorOutputDto = new ArrayList<>();
+      boolean encontrado = false;
+      for(int i = 0; i < personasOutputDto.size(); i++){
+        encontrado = false;
+        for(int j = 0; j < profesores.size() && !encontrado; j++){
+          if (personasOutputDto.get(i).getId_persona().equals(profesores.get(j).getIdPersona().getId_persona())){
+            personaProfesorOutputDto.add(new PersonaProfesorOutputDto(personaRepositorio.findById(personasOutputDto.get(i).getId_persona()).orElseThrow(), profesores.get(j)));
+            encontrado = true;
+          }
+        }
+      }
+      personaOutputDtoList.setPersonaProfesorOutputDtoList(personaProfesorOutputDto);
+      if(outputType.equalsIgnoreCase("profesores")){
+        return personaOutputDtoList;
+      }
+    }
+    if(outputType.equalsIgnoreCase("full")){
+      return personaOutputDtoList;
+
+    }
+    personaOutputDtoList.setPersonaOutputDtoList(personasOutputDto);
+    return personaOutputDtoList;
   }
 
   @Override

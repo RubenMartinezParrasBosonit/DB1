@@ -1,16 +1,13 @@
 package io.github.ruben.persona.infrastructure.controller;
 
 import io.github.ruben.persona.application.PersonaService;
-import io.github.ruben.persona.exceptions.IdNotFoundException;
 import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
+import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDtoList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequestMapping("persona")
 @RestController
@@ -20,17 +17,17 @@ public class ReadPersonaController {
     PersonaService personaService;
 
     @GetMapping
-    public List<PersonaOutputDto> findAll(){
-        return personaService.todasLasPersonas();
+    public PersonaOutputDtoList findAll(@Value("simple") @RequestParam(name = "outputType", defaultValue = "simple", required = false) String outputType){
+        return personaService.findAll(outputType);
     }
 
     @GetMapping("{id}")
-    public PersonaOutputDto getPersonaById(@PathVariable Integer id){
-        return personaService.filtrarPersonasPorId(id);
+    public PersonaOutputDto getPersonaById(@PathVariable Integer id, @Value("simple") @RequestParam(name = "outputType", defaultValue = "simple", required = false) String outputType){
+        return personaService.filtrarPersonasPorId(id, outputType);
     }
 
     @GetMapping("/{usuario}/usuario")
-    public List<PersonaOutputDto> getPersonaByUsuario(@PathVariable String usuario){
-        return personaService.filtrarPersonaPorNombreUsuario(usuario);
+    public PersonaOutputDtoList getPersonaByUsuario(@PathVariable String usuario, @Value("simple") @RequestParam(name = "outputType", defaultValue = "simple", required = false) String outputType){
+        return personaService.filtrarPersonaPorNombreUsuario(usuario, outputType);
     }
 }
