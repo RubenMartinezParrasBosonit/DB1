@@ -3,7 +3,7 @@ package io.github.ruben.profesor.infrastructure.controller;
 import io.github.ruben.profesor.application.ProfesorService;
 import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDto;
 import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDtoList;
-import io.github.ruben.profesor.infrastructure.feing.IFeingProfesor;
+import io.github.ruben.shared.feing.IFeing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ public class ReadProfesorController {
     ProfesorService profesorService;
 
     @Autowired
-    IFeingProfesor iFeingProfesor;
+    IFeing iFeing;
 
     @GetMapping
     public ProfesorOutputDtoList findAll(){
@@ -42,7 +42,7 @@ public class ReadProfesorController {
     @GetMapping("/feing/{id}")
     ResponseEntity<ProfesorOutputDto> getProfesorFeing(@PathVariable String id){
         System.out.println("En client Feing. Antes de llamada a server Profesor: "+id);
-        ResponseEntity<ProfesorOutputDto> rsFeing = iFeingProfesor.callProfesor(id);
+        ResponseEntity<ProfesorOutputDto> rsFeing = iFeing.callProfesor(id);
         System.out.println("En client Feing. Despues de llamada a server");
         return rsFeing;
     }
