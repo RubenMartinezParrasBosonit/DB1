@@ -5,10 +5,6 @@ import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.input.Alumn
 import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output.AlumnosEstudiosOutputDto;
 import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output.AlumnosEstudiosOutputDtoList;
 import io.github.ruben.alumnosEstudios.infrastructure.repository.jpa.AlumnosEstudiosRepositorio;
-import io.github.ruben.persona.domain.Persona;
-import io.github.ruben.profesor.domain.Profesor;
-import io.github.ruben.profesor.infrastructure.controller.dto.input.ProfesorInputDto;
-import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDto;
 import io.github.ruben.shared.exceptions.IdNotFoundException;
 import io.github.ruben.student.domain.Student;
 import io.github.ruben.student.infrastructure.repository.jpa.StudentRepositorio;
@@ -62,32 +58,8 @@ public class AlumnosEstudiosServiceImp implements AlumnosEstudiosService{
                 alumnosEstudiosRepositorio
                         .findById(id)
                         .orElseThrow(() -> new IdNotFoundException("Estudio con id: "+id+ " no encontrado"));
-        AlumnosEstudiosOutputDto alumnosEstudiosOutputDto = new AlumnosEstudiosOutputDto(alumnosEstudios);
 
-        if (alumnosEstudiosInputDto.getEstudio() != null){
-            alumnosEstudiosOutputDto.setEstudio(alumnosEstudiosInputDto.getEstudio());
-        }
-
-        if (alumnosEstudiosInputDto.getComments() != null){
-            alumnosEstudiosOutputDto.setComments(alumnosEstudiosInputDto.getComments());
-        }
-
-        if (alumnosEstudiosInputDto.getInitialDate() != null){
-            alumnosEstudiosOutputDto.setInitialDate(alumnosEstudiosInputDto.getInitialDate());
-        }
-
-        if (alumnosEstudiosInputDto.getFinishDate() != null){
-            alumnosEstudiosOutputDto.setFinishDate(alumnosEstudiosInputDto.getFinishDate());
-        }
-
-        if (alumnosEstudiosInputDto.getStudents() != null){
-            List<String> students = alumnosEstudiosInputDto.getStudents();
-            for(int i = 0; i < students.size(); i++){
-                studentRepositorio.findById(students.get(i)).orElseThrow(()->new IdNotFoundException("Student con id: "+id+ " no válido"));
-            }
-            alumnosEstudiosOutputDto.setStudents(alumnosEstudiosInputDto.getStudents());
-        }
-
+        AlumnosEstudiosOutputDto alumnosEstudiosOutputDto = modificacionAlumnosEstudios(id, alumnosEstudios, alumnosEstudiosInputDto);
         alumnosEstudios = alumnosEstudiosOutputDtoToAlumnosEstudios(alumnosEstudiosOutputDto);
         alumnosEstudiosRepositorio.saveAndFlush(alumnosEstudios);
         return alumnosEstudiosOutputDto;
@@ -133,5 +105,35 @@ public class AlumnosEstudiosServiceImp implements AlumnosEstudiosService{
         alumnosEstudios.setStudents(estudiantes);
 
         return alumnosEstudios;
+    }
+
+    private AlumnosEstudiosOutputDto modificacionAlumnosEstudios(String id, AlumnosEstudios alumnosEstudios, AlumnosEstudiosInputDto alumnosEstudiosInputDto){
+        AlumnosEstudiosOutputDto alumnosEstudiosOutputDto = new AlumnosEstudiosOutputDto(alumnosEstudios);
+
+        if (alumnosEstudiosInputDto.getEstudio() != null){
+            alumnosEstudiosOutputDto.setEstudio(alumnosEstudiosInputDto.getEstudio());
+        }
+
+        if (alumnosEstudiosInputDto.getComments() != null){
+            alumnosEstudiosOutputDto.setComments(alumnosEstudiosInputDto.getComments());
+        }
+
+        if (alumnosEstudiosInputDto.getInitialDate() != null){
+            alumnosEstudiosOutputDto.setInitialDate(alumnosEstudiosInputDto.getInitialDate());
+        }
+
+        if (alumnosEstudiosInputDto.getFinishDate() != null){
+            alumnosEstudiosOutputDto.setFinishDate(alumnosEstudiosInputDto.getFinishDate());
+        }
+
+        if (alumnosEstudiosInputDto.getStudents() != null){
+            List<String> students = alumnosEstudiosInputDto.getStudents();
+            for(int i = 0; i < students.size(); i++){
+                studentRepositorio.findById(students.get(i)).orElseThrow(()->new IdNotFoundException("Student con id: "+id+ " no válido"));
+            }
+            alumnosEstudiosOutputDto.setStudents(alumnosEstudiosInputDto.getStudents());
+        }
+
+        return alumnosEstudiosOutputDto;
     }
 }

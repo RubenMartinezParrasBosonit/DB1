@@ -64,20 +64,8 @@ public class StudentServiceImp implements StudentService{
 
     @Override
     public StudentInputDto aniadirStudent(StudentInputDto studentInputDto) {
-        List<Student> students = studentRepositorio.findAll();
-        List<Profesor> profesores = profesorRepositorio.findAll();
 
-        for (int i = 0; i < students.size(); i++){
-            if(studentInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
-                throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
-            }
-        }
-
-        for (int i = 0; i < profesores.size(); i++){
-            if(studentInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
-                throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
-            }
-        }
+        comprobarSiPersonaAsignada(studentInputDto);
 
         Student student = studentInputDtoToStudent(studentInputDto);
         studentRepositorio.saveAndFlush(student);
@@ -91,54 +79,8 @@ public class StudentServiceImp implements StudentService{
                 studentRepositorio
                         .findById(id)
                         .orElseThrow(() -> new IdNotFoundException("Student con id: "+id+ " no encontrado"));
-        StudentOutputDto studentOutputDto = new StudentOutputDto(student);
 
-
-        if (studentInputDto.getIdPersona() != null) {
-            Persona persona = personaRepositorio.findById(Integer.valueOf(studentInputDto.getIdPersona())).orElseThrow(()->new IdNotFoundException("Persona con id: "+id+ " no encontrada"));
-            List<Student> students = studentRepositorio.findAll();
-            List<Profesor> profesores = profesorRepositorio.findAll();
-
-            for (int i = 0; i < students.size(); i++){
-                if(studentInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
-                    throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
-                }
-            }
-
-            for (int i = 0; i < profesores.size(); i++){
-                if(studentInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
-                    throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
-                }
-            }
-            studentOutputDto.setIdPersona(persona.getId_persona().toString());
-
-        }
-
-        if (studentInputDto.getIdProfesor() != null) {
-            Profesor profesor = profesorRepositorio.findById(studentInputDto.getIdProfesor()).orElseThrow(()->new IdNotFoundException("Profesor con id: "+id+ " no encontrado"));
-            studentOutputDto.setIdProfesor(profesor.getIdProfesor());
-        }
-
-        if (studentInputDto.getBranch() != null){
-            studentOutputDto.setBranch(studentInputDto.getBranch());
-        }
-
-        if (studentInputDto.getComments() != null){
-            studentOutputDto.setComments(studentInputDto.getComments());
-        }
-
-        if (studentInputDto.getNumHoursWeek() != null){
-            studentOutputDto.setNumHoursWeek(studentInputDto.getNumHoursWeek());
-        }
-
-        if (studentInputDto.getEstudios() != null){
-            List<String> estudios = studentInputDto.getEstudios();
-            for(int i = 0; i < estudios.size(); i++){
-                alumnosEstudiosRepositorio.findById(estudios.get(i)).orElseThrow(()->new IdNotFoundException("Estudio con id: "+id+ " no válido"));
-            }
-            studentOutputDto.setEstudios(studentInputDto.getEstudios());
-        }
-
+        StudentOutputDto studentOutputDto = modificacionStudent(id, student, studentInputDto);
         student = studentOutputDtoToStudent(studentOutputDto);
         studentRepositorio.saveAndFlush(student);
         return studentOutputDto;
@@ -245,5 +187,59 @@ public class StudentServiceImp implements StudentService{
         student.setEstudios(estudios);
 
         return student;
+    }
+
+    private void comprobarSiPersonaAsignada(StudentInputDto studentInputDto){
+        List<Student> students = studentRepositorio.findAll();
+        List<Profesor> profesores = profesorRepositorio.findAll();
+
+        for (int i = 0; i < students.size(); i++){
+            if(studentInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
+                throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
+            }
+        }
+
+        for (int i = 0; i < profesores.size(); i++){
+            if(studentInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
+                throw new UnprocesableException("La persona "+studentInputDto.getIdPersona()+ " ya se encuentra asignada");
+            }
+        }
+    }
+
+    private StudentOutputDto modificacionStudent(String id, Student student, StudentInputDto studentInputDto){
+        StudentOutputDto studentOutputDto = new StudentOutputDto(student);
+
+        if (studentInputDto.getIdPersona() != null) {
+            Persona persona = personaRepositorio.findById(Integer.valueOf(studentInputDto.getIdPersona())).orElseThrow(()->new IdNotFoundException("Persona con id: "+id+ " no encontrada"));
+            comprobarSiPersonaAsignada(studentInputDto);
+            studentOutputDto.setIdPersona(persona.getId_persona().toString());
+        }
+
+        if (studentInputDto.getIdProfesor() != null) {
+            Profesor profesor = profesorRepositorio.findById(studentInputDto.getIdProfesor()).orElseThrow(()->new IdNotFoundException("Profesor con id: "+id+ " no encontrado"));
+            studentOutputDto.setIdProfesor(studentInputDto.getIdProfesor());
+        }
+
+        if (studentInputDto.getBranch() != null){
+            studentOutputDto.setBranch(studentInputDto.getBranch());
+        }
+
+        if (studentInputDto.getComments() != null){
+            studentOutputDto.setComments(studentInputDto.getComments());
+        }
+
+        if (studentInputDto.getNumHoursWeek() != null){
+            studentOutputDto.setNumHoursWeek(studentInputDto.getNumHoursWeek());
+        }
+
+        if (studentInputDto.getEstudios() != null){
+            List<String> estudios = studentInputDto.getEstudios();
+            for(int i = 0; i < estudios.size(); i++){
+                alumnosEstudiosRepositorio.findById(estudios.get(i)).orElseThrow(()->new IdNotFoundException("Estudio con id: "+id+ " no válido"));
+            }
+            studentOutputDto.setEstudios(studentInputDto.getEstudios());
+        }
+
+        return studentOutputDto;
     }
 }

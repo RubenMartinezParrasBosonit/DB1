@@ -1,8 +1,5 @@
 package io.github.ruben.student.infrastructure.controller.dto.output;
 
-import io.github.ruben.alumnosEstudios.domain.AlumnosEstudios;
-import io.github.ruben.persona.domain.Persona;
-import io.github.ruben.profesor.domain.Profesor;
 import io.github.ruben.student.domain.Student;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

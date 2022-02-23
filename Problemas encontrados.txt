@@ -1,0 +1,5 @@
+Cuando intento modificar un estudiante, su profesor no se modifica.
+
+El modificar estudios o añadir, hay problemas de claves al asignar estudiantes a estos estudios.
+
+En general, parece que las relaciones están bien hechas, pero mal planteadas.

@@ -1,7 +1,5 @@
 package io.github.ruben.student.infrastructure.controller;
 
-import io.github.ruben.profesor.infrastructure.controller.dto.input.ProfesorInputDto;
-import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDto;
 import io.github.ruben.student.application.StudentService;
 import io.github.ruben.student.infrastructure.controller.dto.input.StudentInputDto;
 import io.github.ruben.student.infrastructure.controller.dto.output.StudentOutputDto;

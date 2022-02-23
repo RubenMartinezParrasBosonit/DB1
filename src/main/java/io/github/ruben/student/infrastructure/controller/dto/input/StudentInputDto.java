@@ -1,6 +1,5 @@
 package io.github.ruben.student.infrastructure.controller.dto.input;
 
-import io.github.ruben.alumnosEstudios.domain.AlumnosEstudios;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

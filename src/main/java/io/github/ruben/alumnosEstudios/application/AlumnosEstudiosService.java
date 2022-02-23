@@ -4,8 +4,6 @@ import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.input.Alumn
 import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output.AlumnosEstudiosOutputDto;
 import io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output.AlumnosEstudiosOutputDtoList;
 
-import java.util.List;
-
 public interface AlumnosEstudiosService {
     public AlumnosEstudiosOutputDtoList findAll();
     public AlumnosEstudiosOutputDto filtrarAlumnosEstudiosPorId(String id);

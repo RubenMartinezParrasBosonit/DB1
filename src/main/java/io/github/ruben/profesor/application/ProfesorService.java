@@ -1,11 +1,9 @@
 package io.github.ruben.profesor.application;
 
-import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
 import io.github.ruben.profesor.infrastructure.controller.dto.input.ProfesorInputDto;
 import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDto;
 import io.github.ruben.profesor.infrastructure.controller.dto.output.ProfesorOutputDtoList;
 
-import java.util.List;
 
 public interface ProfesorService {
     public ProfesorOutputDtoList findAll();

@@ -1,8 +1,6 @@
 package io.github.ruben.profesor.application;
 
 import io.github.ruben.persona.domain.Persona;
-import io.github.ruben.persona.infrastructure.controller.dto.input.PersonaInputDto;
-import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
 import io.github.ruben.persona.infrastructure.repository.jpa.PersonaRepositorio;
 import io.github.ruben.profesor.domain.Profesor;
 import io.github.ruben.profesor.infrastructure.controller.dto.input.ProfesorInputDto;
@@ -53,20 +51,7 @@ public class ProfesorServiceImp implements ProfesorService{
 
     @Override
     public ProfesorInputDto aniadirProfesor(ProfesorInputDto profesorInputDto) {
-        List<Student> students = studentRepositorio.findAll();
-        List<Profesor> profesores = profesorRepositorio.findAll();
-
-        for (int i = 0; i < students.size(); i++){
-            if(profesorInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
-                throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
-            }
-        }
-
-        for (int i = 0; i < profesores.size(); i++){
-            if(profesorInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
-                throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
-            }
-        }
+        comprobarSiPersonaAsignada(profesorInputDto);
 
         Profesor profesor = profesorInputDtoToProfesor(profesorInputDto);
         profesorRepositorio.saveAndFlush(profesor);
@@ -74,57 +59,18 @@ public class ProfesorServiceImp implements ProfesorService{
         return profesorInputDto;
     }
 
-
     @Override
     public ProfesorOutputDto modificarProfesor(String id, ProfesorInputDto profesorInputDto) {
         Profesor profesor =
                 profesorRepositorio
                         .findById(id)
                         .orElseThrow(() -> new IdNotFoundException("Profesor con id: "+id+ " no encontrado"));
-        ProfesorOutputDto profesorOutputDto = new ProfesorOutputDto(profesor);
 
-
-        if (profesorInputDto.getIdPersona() != null) {
-            Persona persona = personaRepositorio.findById(Integer.valueOf(profesorInputDto.getIdPersona())).orElseThrow(()->new IdNotFoundException("Persona con id: "+id+ " no encontrada"));
-            List<Student> students = studentRepositorio.findAll();
-            List<Profesor> profesores = profesorRepositorio.findAll();
-
-            for (int i = 0; i < students.size(); i++){
-                if(profesorInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
-                    throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
-                }
-            }
-
-            for (int i = 0; i < profesores.size(); i++){
-                if(profesorInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
-                    throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
-                }
-            }
-            profesorOutputDto.setIdPersona(String.valueOf(persona.getId_persona()));
-        }
-
-        if (profesorInputDto.getComments() != null) {
-            profesorOutputDto.setComments(profesorInputDto.getComments());
-        }
-
-        if (profesorInputDto.getBranch() != null) {
-            profesorOutputDto.setBranch(profesorInputDto.getBranch());
-        }
-
-        if(profesorInputDto.getStudents() != null){
-            List<String> students = profesorInputDto.getStudents();
-            for(int i = 0; i < students.size(); i++){
-                studentRepositorio.findById(students.get(i)).orElseThrow(()->new IdNotFoundException("Student no válido"));
-            }
-            profesorOutputDto.setStudents(profesorInputDto.getStudents());
-        }
-
+        ProfesorOutputDto profesorOutputDto = modificacionProfesor(id, profesor, profesorInputDto);
         profesor = profesorOutputDtoToProfesor(profesorOutputDto);
         profesorRepositorio.saveAndFlush(profesor);
         return profesorOutputDto;
     }
-
-
 
     @Override
     public void borrarProfesor(String id) {
@@ -133,6 +79,8 @@ public class ProfesorServiceImp implements ProfesorService{
                         .findById(id)
                         .orElseThrow(() -> new IdNotFoundException("Profesor con id: "+id+ " no encontrado")));
     }
+
+
 
     private Profesor profesorInputDtoToProfesor(ProfesorInputDto profesorInputDto){
         Profesor profesor = new Profesor();
@@ -163,5 +111,50 @@ public class ProfesorServiceImp implements ProfesorService{
         profesor.setStudents(estudiantes);
 
         return profesor;
+    }
+
+    private ProfesorOutputDto modificacionProfesor(String id, Profesor profesor, ProfesorInputDto profesorInputDto){
+        ProfesorOutputDto profesorOutputDto = new ProfesorOutputDto(profesor);
+
+        if (profesorInputDto.getIdPersona() != null) {
+            Persona persona = personaRepositorio.findById(Integer.valueOf(profesorInputDto.getIdPersona())).orElseThrow(()->new IdNotFoundException("Persona con id: "+id+ " no encontrada"));
+            comprobarSiPersonaAsignada(profesorInputDto);
+            profesorOutputDto.setIdPersona(String.valueOf(persona.getId_persona()));
+        }
+
+        if (profesorInputDto.getComments() != null) {
+            profesorOutputDto.setComments(profesorInputDto.getComments());
+        }
+
+        if (profesorInputDto.getBranch() != null) {
+            profesorOutputDto.setBranch(profesorInputDto.getBranch());
+        }
+
+        if(profesorInputDto.getStudents() != null){
+            List<String> students = profesorInputDto.getStudents();
+            for(int i = 0; i < students.size(); i++){
+                studentRepositorio.findById(students.get(i)).orElseThrow(()->new IdNotFoundException("Student no válido"));
+            }
+            profesorOutputDto.setStudents(profesorInputDto.getStudents());
+        }
+
+        return profesorOutputDto;
+    }
+
+    private void comprobarSiPersonaAsignada(ProfesorInputDto profesorInputDto){
+        List<Student> students = studentRepositorio.findAll();
+        List<Profesor> profesores = profesorRepositorio.findAll();
+
+        for (int i = 0; i < students.size(); i++){
+            if(profesorInputDto.getIdPersona().equals(String.valueOf(students.get(i).getIdPersona().getId_persona()))){
+                throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
+            }
+        }
+
+        for (int i = 0; i < profesores.size(); i++){
+            if(profesorInputDto.getIdPersona().equals(String.valueOf(profesores.get(i).getIdPersona().getId_persona()))){
+                throw new UnprocesableException("La persona "+profesorInputDto.getIdPersona()+ " ya se encuentra asignada");
+            }
+        }
     }
 }

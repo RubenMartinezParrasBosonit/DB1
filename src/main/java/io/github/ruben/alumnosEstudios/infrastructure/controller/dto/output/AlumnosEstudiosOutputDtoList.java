@@ -1,6 +1,5 @@
 package io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output;
 
-import io.github.ruben.student.infrastructure.controller.dto.output.StudentOutputDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

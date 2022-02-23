@@ -1,7 +1,6 @@
 package io.github.ruben.alumnosEstudios.infrastructure.controller.dto.output;
 
 import io.github.ruben.alumnosEstudios.domain.AlumnosEstudios;
-import io.github.ruben.student.domain.Student;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
