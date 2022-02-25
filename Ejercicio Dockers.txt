@@ -1,0 +1,27 @@
+1- Crear el jar con Maven y crear el Dockerfile, el cual sería algo así:
+
+	FROM openjdk:17
+	EXPOSE 8081
+	COPY /target/*.jar /usr/local/lib/spring.jar
+	ENTRYPOINT ["java", "-jar", "/usr/local/lib/spring.jar"]
+
+2- Desde el directorio donde se encuentra el Dockerfile, ejecutar el siguiente comando:
+
+	docker build -t spring .
+
+3- Creamos la red donde estará nuestra aplicación de Spring boot y Postgresql:
+
+	'docker network create mynetwork'.
+
+4- Ejecutamos Postgresql en esa red con el siguiente comando:
+
+	docker run --network mynetwork --name postgres_test -ePOSTGRES_USER=postgres -e POSTGRES_PASSWORD=contrasena -e POSTGRES_DB=test -p5432:5432 postgres
+
+	Tenemos que estar atentos de que los parámetros especificados aquí coinciden con los especificados en nuestro application.properties
+
+5- Ejecutamos la aplicación spring en la misma red:
+
+	docker run --network mynetwork --name programa_spring -p8080:8080 spring
+
+LISTO!
+

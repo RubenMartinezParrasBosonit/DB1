@@ -18,8 +18,8 @@ public class ReadProfesorController {
     @Autowired
     ProfesorService profesorService;
 
-    @Autowired
-    IFeing iFeing;
+    /*@Autowired
+    IFeing iFeing;*/
 
     @GetMapping
     public ProfesorOutputDtoList findAll(){
@@ -39,11 +39,11 @@ public class ReadProfesorController {
         return ResponseEntity.ok(rs.getBody());
     }
 
-    @GetMapping("/feing/{id}")
+    /*@GetMapping("/feing/{id}")
     ResponseEntity<ProfesorOutputDto> getProfesorFeing(@PathVariable String id){
         System.out.println("En client Feing. Antes de llamada a server Profesor: "+id);
         ResponseEntity<ProfesorOutputDto> rsFeing = iFeing.callProfesor(id);
         System.out.println("En client Feing. Despues de llamada a server");
         return rsFeing;
-    }
+    }*/
 }

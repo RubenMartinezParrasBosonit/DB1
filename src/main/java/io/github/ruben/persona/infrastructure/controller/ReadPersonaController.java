@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("persona")
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET})
 public class ReadPersonaController {
 
     @Autowired

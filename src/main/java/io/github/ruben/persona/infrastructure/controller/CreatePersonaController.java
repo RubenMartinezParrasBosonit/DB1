@@ -4,13 +4,11 @@ import io.github.ruben.persona.application.PersonaService;
 import io.github.ruben.persona.infrastructure.controller.dto.input.PersonaInputDto;
 import io.github.ruben.persona.infrastructure.controller.dto.output.PersonaOutputDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("persona")
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.POST})
 public class CreatePersonaController {
 
     @Autowired
