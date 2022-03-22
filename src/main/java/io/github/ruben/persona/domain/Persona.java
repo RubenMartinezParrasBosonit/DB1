@@ -1,5 +1,6 @@
 package io.github.ruben.persona.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Persona {
 
     @Id
@@ -51,4 +53,6 @@ public class Persona {
 
     @Column(name = "termination_date")
     private Date termination_date;
+
+    private Boolean admin;
 }

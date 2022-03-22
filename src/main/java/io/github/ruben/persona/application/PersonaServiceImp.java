@@ -14,19 +14,28 @@ import io.github.ruben.persona.domain.Persona;
 import io.github.ruben.student.domain.Student;
 import io.github.ruben.student.infrastructure.repository.jpa.StudentRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
-public class PersonaServiceImp implements PersonaService {
+public class PersonaServiceImp implements PersonaService, UserDetailsService {
 
   @Autowired PersonaRepositorio personaRepositorio;
 
   @Autowired StudentRepositorio studentRepositorio;
 
   @Autowired ProfesorRepositorio profesorRepositorio;
+
+  @Autowired
+  PasswordEncoder passwordEncoder;
 
   @Override
   public PersonaOutputDtoList findAll(String outputType) {
@@ -91,6 +100,7 @@ public class PersonaServiceImp implements PersonaService {
 
     PersonaOutputDto personaOutputDto = personaInputDtoToPersonaOutputDto(personaInputDto);
     Persona persona = personaOutputDtoToEntity(personaOutputDto);
+    persona.setPassword(passwordEncoder.encode(persona.getPassword()));
     personaRepositorio.saveAndFlush(persona);
 
     return personaOutputDto;
@@ -117,6 +127,26 @@ public class PersonaServiceImp implements PersonaService {
             .orElseThrow(() -> new IdNotFoundException("Persona con id: "+id+ " no encontrado")));
   }
 
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    List<Persona> listPersona = personaRepositorio.findByUsuario(username);
+    Persona persona;
+    if(listPersona == null){
+      throw new UsernameNotFoundException("User not found");
+    }else{
+      persona = listPersona.get(0);
+    }
+
+    Collection<SimpleGrantedAuthority> auothorities = new ArrayList<>();
+    if(persona.getAdmin()){
+      auothorities.add(new SimpleGrantedAuthority("ADMIN"));
+    }else{
+      auothorities.add(new SimpleGrantedAuthority("USER"));
+    }
+
+    return new org.springframework.security.core.userdetails.User(persona.getUsuario(), persona.getPassword(), auothorities);
+  }
+
 
 
   private Persona personaOutputDtoToEntity(PersonaOutputDto personaOutputDto) {
@@ -133,6 +163,7 @@ public class PersonaServiceImp implements PersonaService {
     persona.setCreated_date(personaOutputDto.getCreated_date());
     persona.setImagen_url(personaOutputDto.getImagen_url());
     persona.setTermination_date(personaOutputDto.getTermination_date());
+    persona.setAdmin(personaOutputDto.getAdmin());
 
     return persona;
   }
@@ -150,6 +181,7 @@ public class PersonaServiceImp implements PersonaService {
     personaOutputDto.setCreated_date(personaInputDto.getCreated_date());
     personaOutputDto.setImagen_url(personaInputDto.getImagen_url());
     personaOutputDto.setTermination_date(personaInputDto.getTermination_date());
+    personaOutputDto.setAdmin(personaInputDto.getAdmin());
 
     return personaOutputDto;
   }
@@ -249,6 +281,9 @@ public class PersonaServiceImp implements PersonaService {
     if (personaInputDto.getCreated_date() == null) {
       throw new UnprocesableException("Created_date no puede ser nulo");
     }
+    if (personaInputDto.getAdmin() == null) {
+      throw new UnprocesableException("Admin no puede ser nulo");
+    }
   }
 
   private PersonaOutputDto modificacionPersona(Persona persona, PersonaInputDto personaInputDto){
@@ -301,6 +336,12 @@ public class PersonaServiceImp implements PersonaService {
       personaOutputDto.setTermination_date(personaInputDto.getTermination_date());
     }
 
+    if (personaInputDto.getAdmin() != null) {
+      personaOutputDto.setAdmin(personaInputDto.getAdmin());
+    }
+
     return personaOutputDto;
   }
+
+
 }
